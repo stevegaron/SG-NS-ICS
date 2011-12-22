@@ -219,7 +219,7 @@ static struct platform_driver oprofile_driver = {
 
 static struct platform_device *oprofile_pdev;
 
-static int __init init_driverfs(void)
+static int init_driverfs(void)
 {
 	int ret;
 
@@ -269,7 +269,7 @@ void oprofile_perf_exit(void)
 	exit_driverfs();
 }
 
-int __init oprofile_perf_init(struct oprofile_operations *ops)
+int oprofile_perf_init(struct oprofile_operations *ops)
 {
 	int cpu, ret = 0;
 
