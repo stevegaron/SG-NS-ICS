@@ -20,6 +20,9 @@
 #ifdef CONFIG_BLD
 #include <linux/bld.h>
 #endif
+#ifdef CONFIG_GENERIC_BLN
+#include <linux/bln.h>
+#endif
 
 #include "herring.h"
 
@@ -50,6 +53,22 @@ static struct bld_implementation herring_touchkey_bld =
 	.disable = herring_touchkey_bld_disable,
     };
 #endif
+#ifdef CONFIG_GENERIC_BLN
+static void herring_touchkey_bln_enable(void)
+{
+	herring_touchkey_led_onoff(1);
+}
+
+static void herring_touchkey_bln_disable(void)
+{
+	herring_touchkey_led_onoff(0);
+}
+
+static struct bln_implementation herring_touchkey_bln = {
+	.enable = herring_touchkey_bln_enable,
+	.disable = herring_touchkey_bln_disable,
+};
+#endif
 
 static void herring_touchkey_led_early_suspend(struct early_suspend *h)
 {
@@ -72,10 +91,25 @@ static int __init herring_init_touchkey_led(void)
 	int i;
 	int ret = 0;
 
+#ifdef CONFIG_GENERIC_BLN
+	u32 gpio;
+#endif
+
 	if (!machine_is_herring() || !herring_is_tft_dev())
 		return 0;
 
 	for (i = 0; i < ARRAY_SIZE(led_gpios); i++) {
+#ifdef CONFIG_GENERIC_BLN
+		gpio = S5PV210_GPJ3(led_gpios[i]);
+		ret = gpio_request(gpio, "touchkey led");
+		if (ret) {
+			pr_err("Failed to request touchkey led gpio %d\n", i);
+			goto err_req;
+		}
+		s3c_gpio_setpull(gpio, S3C_GPIO_PULL_NONE);
+		s3c_gpio_slp_cfgpin(gpio, S3C_GPIO_SLP_PREV);
+		s3c_gpio_slp_setpull_updown(gpio, S3C_GPIO_PULL_NONE);
+#else
 		ret = gpio_request(S5PV210_GPJ3(led_gpios[i]), "touchkey led");
 		if (ret) {
 			pr_err("Failed to request touchkey led gpio %d\n", i);
@@ -83,6 +117,7 @@ static int __init herring_init_touchkey_led(void)
 		}
 		s3c_gpio_setpull(S5PV210_GPJ3(led_gpios[i]),
 							S3C_GPIO_PULL_NONE);
+#endif
 	}
 
 	herring_touchkey_led_onoff(1);
@@ -91,6 +126,9 @@ static int __init herring_init_touchkey_led(void)
 
 #ifdef CONFIG_BLD
 	register_bld_implementation(&herring_touchkey_bld);
+#endif
+#ifdef CONFIG_GENERIC_BLN
+	register_bln_implementation(&herring_touchkey_bln);
 #endif
 
 	return 0;
