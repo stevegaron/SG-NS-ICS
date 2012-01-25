@@ -37,7 +37,7 @@
  *   inode_lru, inode->i_lru
  * inode_sb_list_lock protects:
  *   sb->s_inodes, inode->i_sb_list
- * inode_wb_list_lock protects:
+ * bdi->wb.list_lock protects:
  *   bdi->wb.b_{dirty,io,more_io}, inode->i_wb_list
  * inode_hash_lock protects:
  *   inode_hashtable, inode->i_hash
@@ -48,7 +48,7 @@
  *   inode->i_lock
  *     inode_lru_lock
  *
- * inode_wb_list_lock
+ * bdi->wb.list_lock
  *   inode->i_lock
  *
  * inode_hash_lock
@@ -68,7 +68,6 @@ static LIST_HEAD(inode_lru);
 static DEFINE_SPINLOCK(inode_lru_lock);
 
 __cacheline_aligned_in_smp DEFINE_SPINLOCK(inode_sb_list_lock);
-__cacheline_aligned_in_smp DEFINE_SPINLOCK(inode_wb_list_lock);
 
 /*
  * iprune_sem provides exclusion between the icache shrinking and the
@@ -405,12 +404,12 @@ void __insert_inode_hash(struct inode *inode, unsigned long hashval)
 EXPORT_SYMBOL(__insert_inode_hash);
 
 /**
- *	remove_inode_hash - remove an inode from the hash
+ *	__remove_inode_hash - remove an inode from the hash
  *	@inode: inode to unhash
  *
  *	Remove an inode from the superblock.
  */
-void remove_inode_hash(struct inode *inode)
+void __remove_inode_hash(struct inode *inode)
 {
 	spin_lock(&inode_hash_lock);
 	spin_lock(&inode->i_lock);
@@ -418,7 +417,7 @@ void remove_inode_hash(struct inode *inode)
 	spin_unlock(&inode->i_lock);
 	spin_unlock(&inode_hash_lock);
 }
-EXPORT_SYMBOL(remove_inode_hash);
+EXPORT_SYMBOL(__remove_inode_hash);
 
 void end_writeback(struct inode *inode)
 {
