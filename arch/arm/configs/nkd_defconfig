@@ -1,6 +1,6 @@
 #
 # Automatically generated make config: don't edit
-# Linux/arm 3.0.18 Kernel Configuration
+# Linux/arm 3.0.19 Kernel Configuration
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -2701,7 +2701,6 @@ CONFIG_DEBUG_INFO=y
 # CONFIG_DEBUG_NOTIFIERS is not set
 # CONFIG_DEBUG_CREDENTIALS is not set
 CONFIG_FRAME_POINTER=y
-# CONFIG_BOOT_PRINTK_DELAY is not set
 # CONFIG_RCU_TORTURE_TEST is not set
 CONFIG_RCU_CPU_STALL_TIMEOUT=60
 CONFIG_RCU_CPU_STALL_VERBOSE=y
@@ -2733,7 +2732,6 @@ CONFIG_BRANCH_PROFILE_NONE=y
 # CONFIG_STACK_TRACER is not set
 # CONFIG_BLK_DEV_IO_TRACE is not set
 # CONFIG_RING_BUFFER_BENCHMARK is not set
-# CONFIG_DYNAMIC_DEBUG is not set
 # CONFIG_DMA_API_DEBUG is not set
 # CONFIG_ATOMIC64_SELFTEST is not set
 # CONFIG_SAMPLES is not set
