@@ -13,6 +13,11 @@ config FB_S3C
 	---help---
 	  This enables support for Samsung Display Controller (FIMD)
 
+config FB_S3C_INCREASED_HZ
+        bool "Increase display frequency to 72Hz"
+        depends on FB_S3C
+	default n
+
 config FB_S3C_SPLASH_SCREEN
         bool "SPLASH_SCREEN on LCD"
         depends on FB_S3C
@@ -110,6 +115,14 @@ config FB_S3C_TL2796
         select SPI_BITBANG
         ---help---
           This enables support for Samsung TL2796 WVGA LCD panel
+
+config FB_S3C_TL2796_6500K_COLORS
+        bool "TL2796 6500K Colors"
+        depends on FB_S3C_TL2796
+	default y
+        ---help---
+          This uses 6500K (D65) colors instead of the default 8500K
+	  of the panel.
 
 config FB_S3C_NT35580
         bool "NT35580"

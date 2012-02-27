@@ -43,7 +43,7 @@ static int __sync_filesystem(struct super_block *sb, int wait)
 	if (wait)
 		sync_inodes_sb(sb);
 	else
-		writeback_inodes_sb(sb);
+		writeback_inodes_sb(sb, WB_REASON_SYNC);
 
 	if (sb->s_op->sync_fs)
 		sb->s_op->sync_fs(sb, wait);
@@ -98,7 +98,7 @@ static void sync_filesystems(int wait)
  */
 SYSCALL_DEFINE0(sync)
 {
-	wakeup_flusher_threads(0);
+	wakeup_flusher_threads(0, WB_REASON_SYNC);
 	sync_filesystems(0);
 	sync_filesystems(1);
 	if (unlikely(laptop_mode))
@@ -219,12 +219,20 @@ static int do_fsync(unsigned int fd, int datasync)
 
 SYSCALL_DEFINE1(fsync, unsigned int, fd)
 {
+#ifdef CONFIG_FILE_SYNC
 	return do_fsync(fd, 0);
+#else
+	return 0;
+#endif
 }
 
 SYSCALL_DEFINE1(fdatasync, unsigned int, fd)
 {
+#ifdef CONFIG_FILE_SYNC
 	return do_fsync(fd, 1);
+#else
+	return 0;
+#endif
 }
 
 /**
@@ -294,6 +302,7 @@ EXPORT_SYMBOL(generic_write_sync);
 SYSCALL_DEFINE(sync_file_range)(int fd, loff_t offset, loff_t nbytes,
 				unsigned int flags)
 {
+#ifdef CONFIG_FILE_SYNC
 	int ret;
 	struct file *file;
 	struct address_space *mapping;
@@ -373,6 +382,9 @@ out_put:
 	fput_light(file, fput_needed);
 out:
 	return ret;
+#else
+	return 0;
+#endif
 }
 #ifdef CONFIG_HAVE_SYSCALL_WRAPPERS
 asmlinkage long SyS_sync_file_range(long fd, loff_t offset, loff_t nbytes,

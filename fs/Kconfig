@@ -57,6 +57,13 @@ config FILE_LOCKING
           for filesystems like NFS and for the flock() system
           call. Disabling this option saves about 11k.
 
+config FILE_SYNC
+	bool "Enable file sync"
+	default y
+	help
+	  Removing file sync makes the system a lot faster but
+	  can have undesired effect on crash
+
 source "fs/notify/Kconfig"
 
 source "fs/quota/Kconfig"
